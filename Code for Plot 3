@@ -1,0 +1,22 @@
+library(lubridate)
+
+# Read data, set date column to date class, and subset by the lower and upper date limits
+filename <- "household_power_consumption.txt"
+read.csv(filename, sep = ";", stringsAsFactors = FALSE) -> data
+data$Date <- dmy(data$Date)
+lowerlim <- dmy("1-2-2007")
+upperlim <- dmy("2-2-2007")
+datasub <- subset(data, Date >= lowerlim & Date <= upperlim)
+
+datasub[3:9] <- lapply(datasub[3:9], as.numeric)
+
+datasub$fulltime <- paste(datasub$Date, datasub$Time)
+datasub$fulltime <- ymd_hms(datasub$fulltime)
+
+
+with(datasub, plot(fulltime, Sub_metering_1, type = "l", xlab = "", ylab = "Energy sub metering"))
+with(datasub, lines(fulltime, Sub_metering_2, col = "red"))
+with(datasub, lines(fulltime, Sub_metering_3, col = "blue"))
+legend("topright", col = c("black", "red", "blue"), c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), lwd = 1, lty = 1)
+dev.copy(png, "Plot 3.png")
+dev.off
